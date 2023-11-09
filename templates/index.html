@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Resizer</title>
+    <style>
+        body {
+            font-family: serif;
+            background-color: lightcyan;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #0074d9;
+        }
+        .container-wrapper {
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 5px solid #ccc;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+            margin: 0 auto;
+        }
+        .input-label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input[type="file"], input[type="number"] {
+            width: 70%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #resizeButton {
+            background-color: #0074d9;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #result {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #0074d9;
+        }
+        #downloadLink {
+            display: none;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container-wrapper">
+        <h1>Image Resizer</h1>
+        <div class="container">
+            <form id="imageUploadForm">
+                <label for="imageInput" class="input-label">Select an image:</label>
+                <input type="file" id="imageInput" accept="image/*" required>
+                <label for="resizePercentage" class="input-label">Resize Percentage (1-100):</label>
+                <input type="number" id="resizePercentage" min="1" max="100" required>
+                <button type="button" id="resizeButton">Resize Image</button>
+            </form>
+            <div id="result"></div>
+            <a id="downloadLink" download="{{download_name}}" href="#">Download Resized Image</a>
+        </div>
+    </div>
+    
+
+    <script>
+        document.getElementById("resizeButton").addEventListener("click", function() {
+            var input = document.getElementById("imageInput");
+            var percentage = document.getElementById("resizePercentage").value;
+
+            if (input.files.length > 0) {
+                var file = input.files[0];
+                var formData = new FormData();
+                formData.append("image", file);
+                formData.append("percentage", percentage);
+
+                fetch("/resize", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.blob())
+                .then(data => {
+                    document.getElementById("result").innerHTML = "Image resized and saved successfully.";
+                    document.getElementById("downloadLink").style.display = "block";
+                    var url = window.URL.createObjectURL(data);
+                    document.getElementById("downloadLink").href = url;
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
+
+
