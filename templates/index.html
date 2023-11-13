@@ -1,53 +1,75 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Image Resizer</title>
     <style>
         body {
+            flex-direction: column;
             font-family: serif;
             background-color: lightcyan;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-content: center;
+            height: max-content;
             margin: 0;
         }
-        h1 {
-            text-align: center;
-            color: #0074d9;
+        nav {
+            background-color: cadetblue;
+            display: flex;
+            justify-content: center;
         }
-        .container-wrapper {
+        nav a {
+            color: white;
+            text-align: center;
+            padding: 14px 150px;
+            text-decoration: none;
+        }
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        h1 {
+            align-self: center;
+            color: darkslategray;
+            width: max-content;
+        }
+        h3{
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+        h4{
+            margin: 10px auto 9px;
             text-align: center;
         }
         .container {
-            max-width: 400px;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            border: 5px solid #ccc;
-            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
-            margin: 0 auto;
+            align-self: center;
+            align-content: center;
+            align-items: center;
+            flex-direction: row;
+            margin: 10px auto auto;
+            display: flex;
         }
         .input-label {
-            display: block;
-            margin-top: 10px;
+            margin-top: 30px ;
             font-weight: bold;
         }
         input[type="file"], input[type="number"] {
-            width: 70%;
+            width: 280px;
             padding: 10px;
             margin: 5px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        #resizeButton {
+        #resizeButton{
             background-color: #0074d9;
             color: #fff;
             border: none;
+            margin-top: 40px;
+            width: 300px;
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 5px;
+        }
+        #resizeButton:hover{
+            background-color: #004f9e;
         }
         #result {
             text-align: center;
@@ -60,55 +82,128 @@
             text-align: center;
             font-weight: bold;
             margin-top: 10px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .header{
+            background-color: white;
+            display: flex;
+            justify-content: center;
+        }
+        #ImageUploadForm{
+            flex-direction: column;
+            display: flex;
+            align-self: center;
+            width: 300PX;
+            margin-left: auto;
+            margin-right: 200px;
+        }
+        #file{
+            margin-right: auto;
+            margin-left: 250px;
+        }
+        #fileback{
+            height: auto;
+            width: auto;
+            background-color: transparent;
+        }
+        .loader{
+            margin: 20px auto 9px;
+            border: 10px solid #f3f3f3;
+            border-top: 10px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        #Loadingicon{
+            display: none;
+            margin-top: 20px;
+            width: max-content;
         }
     </style>
 </head>
-
-
 <body>
-    <div class="container-wrapper">
-        <h1>Image Resizer</h1>
-        <div class="container">
-            <form id="imageUploadForm">
-                <label for="imageInput" class="input-label">Select an image:</label>
-                <input type="file" id="imageInput" accept="image/*" required>
-                <label for="resizePercentage" class="input-label">Resize Percentage (1-100):</label>
-                <input type="number" id="resizePercentage" min="1" max="100" required>
-                <button type="button" id="resizeButton">Resize Image</button>
-            </form>
-            <div id="result"></div>
-            <a id="downloadLink" download="{{download_name}}" href="#">Download Resized Image</a>
-        </div>
+    <div class="header">
+        <h1>The Resizer</h1>
     </div>
-    
-
+    <nav>
+        <a href="https://www.google.com/">Home</a>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+        <a href="#">Contact</a>
+    </nav>
+    <div class="container">
+        <div id="file">
+            <h2>The File Entered:</h2>
+            <div id="fileback">
+                <Image id="selectedImage"  width="auto" height="400" controls>
+                    <source src="filelogo1.jpg" type="Image/*">
+                </Image>
+            </div>
+        </div>
+        <div id="Loadingicon">
+            <div id="Loader" class="loader">
+            </div>
+            <h4>Resizing...</h4>
+        </div>
+        <div id="result">
+        </div>
+        <a id="downloadLink" download="#" href="#">Download Resized Image</a>
+        <form id="ImageUploadForm">
+            <h3>Resize your file</h3>
+            <label for="ImageInput" class="input-label">Select the Image:</label>
+            <input type="file" id="ImageInput" accept="Image/mp4" onchange="displaySelectedFile()" required>
+            <label for="resizePercentage" class="input-label">Resize Percentage (1-100):</label>
+            <input type="number" id="resizePercentage" min="1" max="100" onchange="clearscreen()">
+            <button type="button" id="resizeButton" onchange="clearscreen()" >Resize</button>
+        </form>
+    </div>
     <script>
-        document.getElementById("resizeButton").addEventListener("click", function() {
-            var input = document.getElementById("imageInput");
+        function displaySelectedFile() {
+            clearscreen()
+            var input = document.getElementById("ImageInput");
+            var file = input.files[0];
+            var imageElement = document.getElementById("selectedImage");
+            if (file) {
+                var url = URL.createObjectURL(file);
+                imageElement.src = url;
+            }
+        }
+        function clearscreen(){
+            document.getElementById("downloadLink").style.display = "none";
+            document.getElementById("Loadingicon").style.display = "none";
+        }
+        function Resize() {
+            document.getElementById("Loadingicon").style.display = "block";
+            document.getElementById("Loader").style.display = "block";
+            var input = document.getElementById("ImageInput");
             var percentage = document.getElementById("resizePercentage").value;
-
             if (input.files.length > 0) {
                 var file = input.files[0];
                 var formData = new FormData();
-                formData.append("image", file);
+                formData.append("Image", file);
                 formData.append("percentage", percentage);
-
                 fetch("/resize", {
                     method: "POST",
                     body: formData
                 })
                 .then(response => response.blob())
                 .then(data => {
-                    document.getElementById("result").innerHTML = "Image resized and saved successfully.";
                     document.getElementById("downloadLink").style.display = "block";
                     var url = window.URL.createObjectURL(data);
                     document.getElementById("downloadLink").href = url;
+                    document.getElementById("downloadLink").download = "resized_"+file.name;
+                    document.getElementById("Loadingicon").style.display = "none";
+                    document.getElementById("Loader").style.display = "none";
                 });
             }
-        });
+        }
+        document.getElementById("resizeButton").addEventListener("click", Resize);
     </script>
-
 </body>
 </html>
-
-
