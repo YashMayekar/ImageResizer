@@ -2,20 +2,17 @@ import cv2
 from PIL import Image, ImageSequence
 import tempfile
 import numpy as np
-
 def resize_image(uploaded_file, sp, ext):
     with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as temp_file:
         source = uploaded_file.filename
         if source.lower().endswith((".jpeg", ".jpg", ".png")):
-            # Process JPEG or PNG
             image_data = uploaded_file.read()
             src = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_UNCHANGED)
-            width = int(src.shape[1] * sp / 100)
-            height = int(src.shape[0] * sp / 100)
+            width = int(src.shape[1] * (100 - sp) / 100)
+            height = int(src.shape[0] * (100 - sp) / 100)
             output = cv2.resize(src, (width, height))
             cv2.imwrite(temp_file.name, output)
         elif source.lower().endswith(".gif"):
-            # Process GIF
             img = Image.open(uploaded_file)
             frames = []
             for frame in ImageSequence.Iterator(img):
